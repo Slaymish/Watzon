@@ -125,11 +125,11 @@ public class App implements Runnable {
     }
 
     // top teams
-    public static String[] getTopTeams(ArrayList<Team> OCEteams) {
-        String[] teams = new String[10];
+    public static String[] getTopTeams(ArrayList<Team> OCEteams, int num) {
+        String[] teams = new String[num];
 
         // Loop through all teams
-        for (int i=0; i < 10; i++){
+        for (int i=0; i < num && i < OCEteams.size(); i++) {
             teams[i] = OCEteams.get(i).teamName;
         }
 
