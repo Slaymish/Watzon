@@ -1,0 +1,62 @@
+const lib = require('lib')({token: process.env.STDLIB_SECRET_TOKEN});
+
+await lib.discord.channels['@0.3.0'].messages.create({
+  "channel_id": `${context.params.event.channel_id}`,
+  "content": "",
+  "tts": false,
+  "components": [
+    {
+      "type": 1,
+      "components": [
+        {
+          "custom_id": `row_0_select_0`,
+          "options": [
+            {
+              "label": `Team Stats`,
+              "value": `teamstats`,
+              "default": true
+            },
+            {
+              "label": `Player Stats`,
+              "value": `playerstats`,
+              "default": false
+            }
+          ],
+          "min_values": 1,
+          "max_values": 1,
+          "type": 3
+        }
+      ]
+    }
+  ],
+  "embeds": [
+    {
+      "type": "rich",
+      "title": `Devils`,
+      "description": `[Team Page](https://vrmasterleague.com/EchoArena/Teams/e13XNkApf6WVpBI9jgsLBQ2)`,
+      "color": 0xdedfdf,
+      "fields": [
+        {
+          "name": `Rank`,
+          "value": `1`,
+          "inline": true
+        },
+        {
+          "name": `MMR`,
+          "value": `1280`,
+          "inline": true
+        },
+        {
+          "name": `Active`,
+          "value": `Yes`,
+          "inline": true
+        }
+      ],
+      "thumbnail": {
+        "url": `https://vrmasterleague.com/images/logos/teams/6560d599-9ffe-4946-91e2-7f2c9752d47f.png`,
+        "height": 0,
+        "width": 50
+      }
+    }
+  ]
+});
