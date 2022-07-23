@@ -32,7 +32,7 @@ public class Bot extends ListenerAdapter {
     public String url = "https://api.vrmasterleague.com";
     
     private static String botURl;
-    private static final String TOKEN = "";
+    private static final String TOKEN = "OTkxMjg5MTQwMzMzMjU2NzA0.GKnaO3.mc3Qb4V5cr7XalHVWidNtaV5zLpzII4mDpEQUk";
     //private static final String APP_ID = "12345654321";
     private static final Color WATZ_COL = new Color(30,203,225);
     
@@ -88,7 +88,8 @@ public class Bot extends ListenerAdapter {
             g.updateCommands()
                 .addCommands(Commands.slash("test", "to test slash commands"))
                 .addCommands(Commands.slash("help", "Information about the bot"))
-                .addCommands(Commands.slash("top", "View the top 10 teams"))
+                .addCommands(Commands.slash("top", "View the top 10 teams")
+                    .addOption(OptionType.STRING, "amount", "How many teams do you want to display"))
                 .addCommands(Commands.slash("size", "View the size of OCE"))
                 .addCommands(Commands.slash("team", "Information about a team")
                     .addOption(OptionType.STRING, "name", "What team would you like to know about?", true))
@@ -126,7 +127,8 @@ public class Bot extends ListenerAdapter {
                 teamEmbed.clear();
                 break;
             case "top":
-                event.replyEmbeds(topTeams(event).build()).setEphemeral(false) // Ephemeral means only sender can see
+                Integer num = Integer.parseInt(event.getOption("amount").getAsString());
+                event.replyEmbeds(topTeams(event, num).build()).setEphemeral(false) // Ephemeral means only sender can see
                 .queue();
                 break;
 
@@ -405,8 +407,8 @@ public class Bot extends ListenerAdapter {
 
     }
 
-    public EmbedBuilder topTeams(SlashCommandInteractionEvent event){
-        String[] teams = App.getTopTeams(App.OCETeams);
+    public EmbedBuilder topTeams(SlashCommandInteractionEvent event, int num){
+        String[] teams = App.getTopTeams(App.OCETeams, num);
         String msg = "";
         EmbedBuilder em = new EmbedBuilder();
         em.setTitle("Top ten OCE teams");
