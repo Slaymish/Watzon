@@ -1,13 +1,14 @@
 package vrml.api;
 
 import javax.security.auth.login.LoginException;
-
 import org.json.simple.parser.ParseException;
-
 import java.awt.Color;
+import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
-
+import java.util.Scanner;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -31,9 +32,8 @@ public class Bot extends ListenerAdapter {
     static EmbedBuilder playerStats = new EmbedBuilder();
     public String shortUrl = "https://vrmasterleague.com";
     public String url = "https://api.vrmasterleague.com";
-    
+    private static String TOKEN = "";
     private static String botURl;
-    private static final String TOKEN = "OTkxMjg5MTQwMzMzMjU2NzA0.GHMndH._S8SZUcO39x5TT1y66X71GSj3KnocmBIS-df04";
     //private static final String APP_ID = "12345654321";
     private static final Color WATZ_COL = new Color(30,203,225);
     
@@ -44,6 +44,17 @@ public class Bot extends ListenerAdapter {
 
     public static void initialize() throws LoginException, InterruptedException {
         // Get token from file
+        try {
+            Path path = FileSystems.getDefault().getPath("token.txt");
+            File tokenFile = new File(path.toString());
+            try (Scanner scanner = new Scanner(tokenFile)) {
+                TOKEN = scanner.nextLine();
+                System.out.println(TOKEN);
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error Files" + e.getMessage());
+        }
 
         startTime = System.currentTimeMillis();
 
