@@ -4,8 +4,6 @@ import javax.security.auth.login.LoginException;
 import org.json.simple.parser.ParseException;
 import java.awt.Color;
 import java.io.File;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -17,7 +15,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -34,13 +31,13 @@ public class Bot extends ListenerAdapter {
     public String url = "https://api.vrmasterleague.com";
     private static String TOKEN = "";
     private static String botURl;
-    //private static final String APP_ID = "12345654321";
     private static final Color WATZ_COL = new Color(30,203,225);
     
 
     // Add guilds
     public static Guild scrimOrg;
     public static Guild hydra;
+    public static Guild oceFinalists;
 
     public static void initialize() throws LoginException, InterruptedException {
         // Get token from file
@@ -69,10 +66,12 @@ public class Bot extends ListenerAdapter {
         // Add guilds
         scrimOrg = jda.getGuildById("810205195941838908");
         hydra = jda.getGuildById("601584998616924189");
+        oceFinalists = jda.getGuildById("942311333888659466");
 
         // Set up commands
         addCommands(scrimOrg);
         addCommands(hydra);
+        addCommands(oceFinalists);
 
         // Get bots avatar
         botURl = jda.getSelfUser().getAvatar().getUrl();
@@ -346,32 +345,32 @@ public class Bot extends ListenerAdapter {
     */
     
 
-    public static void captainRoles(){
+    public static void captainRoles(Guild g){
 
         // Remove captain role from all players
-        for (Member m : scrimOrg.getMembers()){
+        for (Member m : g.getMembers()){
             for (Role r : m.getRoles()){
                 if (r.getName().equals("Captain")){
-                    scrimOrg.removeRoleFromMember(m, r);
+                    g.removeRoleFromMember(m, r);
                 }
             }
         }
 
         Role capRole = null;
         // Add captain role to captains
-        for (Role r : scrimOrg.getRoles()){
+        for (Role r : g.getRoles()){
             if (r.getId().equals("993482208067203152")){
                 capRole = r;
             }
         }
         
-        ArrayList<Member> scrimMems = (ArrayList<Member>) scrimOrg.getMembers();
+        ArrayList<Member> scrimMems = (ArrayList<Member>) g.getMembers();
         
         for (Player p: App.captains){
             for (Member m : scrimMems){
                 if (m.getId().equals(p.discordID)){
-                    System.out.println(scrimOrg.getMemberById(p.discordID).getNickname());
-                    scrimOrg.addRoleToMember(scrimOrg.getMemberById(p.discordID), capRole).queue();;
+                    System.out.println(g.getMemberById(p.discordID).getNickname());
+                    g.addRoleToMember(g.getMemberById(p.discordID), capRole).queue();;
                 }
             }
         }
@@ -427,13 +426,13 @@ public class Bot extends ListenerAdapter {
     }
 
     public EmbedBuilder topTeams(SlashCommandInteractionEvent event, int num){
-        String[] teams = App.getTopTeams(App.OCETeams, num);
+        Team[] teams = App.getTopTeams(App.OCETeams, num);
         String msg = "";
         EmbedBuilder em = new EmbedBuilder();
         em.setTitle("Top ten OCE teams");
         for (int i = 0; i < teams.length; i++){
-            msg = (i+1) + ":  " + teams[i];
-            em.addField(msg, "", false);
+            msg = (i+1) + ":  " + teams[i].teamName;
+            em.addField(msg, teams[i].teamMMR, false);
             
         }
 

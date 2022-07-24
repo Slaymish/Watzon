@@ -125,12 +125,12 @@ public class App implements Runnable {
     }
 
     // top teams
-    public static String[] getTopTeams(ArrayList<Team> OCEteams, int num) {
-        String[] teams = new String[num];
+    public static Team[] getTopTeams(ArrayList<Team> OCEteams, int num) {
+        Team[] teams = new Team[num];
 
         // Loop through all teams
         for (int i=0; i < num && i < OCEteams.size(); i++) {
-            teams[i] = OCEteams.get(i).teamName;
+            teams[i] = OCEteams.get(i);
         }
 
         return teams;
@@ -274,7 +274,7 @@ public class App implements Runnable {
                     System.out.println("Updating all");
                     OCETeams = getOCETeams();
                     captains = getCaptains();
-                    Bot.captainRoles();
+                    Bot.captainRoles(Bot.scrimOrg);
                     System.out.println("OCE teams updated");
                 } catch (ParseException e) {
                     e.printStackTrace();
