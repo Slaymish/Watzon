@@ -1,13 +1,14 @@
 package vrml.api;
 
 import javax.security.auth.login.LoginException;
-
 import org.json.simple.parser.ParseException;
-
 import java.awt.Color;
+import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
-
+import java.util.Scanner;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -27,12 +28,12 @@ public class Bot extends ListenerAdapter {
     static EmbedBuilder helpEmbed = new EmbedBuilder();
     static EmbedBuilder teamEmbed = new EmbedBuilder();
     static EmbedBuilder matchesEmbed =  new EmbedBuilder();
+    static EmbedBuilder infoEmbed = new EmbedBuilder();
     static EmbedBuilder playerStats = new EmbedBuilder();
     public String shortUrl = "https://vrmasterleague.com";
     public String url = "https://api.vrmasterleague.com";
-    
+    private static String TOKEN = "";
     private static String botURl;
-    private static final String TOKEN = "OTkxMjg5MTQwMzMzMjU2NzA0.GKnaO3.mc3Qb4V5cr7XalHVWidNtaV5zLpzII4mDpEQUk";
     //private static final String APP_ID = "12345654321";
     private static final Color WATZ_COL = new Color(30,203,225);
     
@@ -43,6 +44,17 @@ public class Bot extends ListenerAdapter {
 
     public static void initialize() throws LoginException, InterruptedException {
         // Get token from file
+        try {
+            Path path = FileSystems.getDefault().getPath("token.txt");
+            File tokenFile = new File(path.toString());
+            try (Scanner scanner = new Scanner(tokenFile)) {
+                TOKEN = scanner.nextLine();
+                System.out.println(TOKEN);
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error Files" + e.getMessage());
+        }
 
         startTime = System.currentTimeMillis();
 
@@ -79,6 +91,14 @@ public class Bot extends ListenerAdapter {
         addFooter(helpEmbed);
 
         helpEmbed.setColor(WATZ_COL);
+
+        infoEmbed.setTitle("Watzon Information");
+        infoEmbed.setColor(WATZ_COL);
+        infoEmbed.addField("Use /help for more information","", false);
+        infoEmbed.addField("Github", "https://github.com/Slaymish/Watzon", false);
+        infoEmbed.addField("Trello","[Trello Page](https://trello.com/invite/b/AeB7rrWR/c5a1f34f3fbb07945d454b888c910b6a/watzon)", false);
+        infoEmbed.setThumbnail(botURl);
+        addFooter(infoEmbed);
     }
 
     public static void addCommands(Guild g){
@@ -98,7 +118,7 @@ public class Bot extends ListenerAdapter {
                     .addOption(OptionType.INTEGER, "number", "What match would you like to know about?", true))
                 .addCommands(Commands.slash("player", "View the team that a player is on")
                     .addOption(OptionType.STRING, "player", "What player would you like to know about?", true))
-                .addCommands(Commands.slash("shutdown", "Shuts down the bot"))
+                .addCommands(Commands.slash("info", "Shows bot infomation"))
                   .queue();
     }
 
@@ -142,13 +162,10 @@ public class Bot extends ListenerAdapter {
                 .queue();
                 break;
             case "player":
-                try {
-                    event.replyEmbeds(playerStats(event).build()).setEphemeral(false) // Ephemeral means only sender can see
-                    .queue();
-                } catch (LoginException | ParseException | InterruptedException e) {
-                    event.reply("An error occured").setEphemeral(false).queue();
-                    e.printStackTrace();
-                }
+                event.replyEmbeds(infoEmbed.build()).setEphemeral(false) // Ephemeral means only sender can see
+                .queue();
+            case "info":
+                event.replyEmbeds(infoEmbed.build()).setEphemeral(false).queue(); // Ephemeral means.queue(); // Ephemeral means only sender can see
 
             default:
                 event.reply("Unknown command (use /help)").setEphemeral(false).queue(); // Ephemeral means only sender can see
@@ -269,6 +286,7 @@ public class Bot extends ListenerAdapter {
         return playerStats;
     }
 
+
     private EmbedBuilder showMatches(SlashCommandInteractionEvent event) {
         matchesEmbed.clear();
         matchesEmbed.setTitle("Upcoming matches");
@@ -379,12 +397,13 @@ public class Bot extends ListenerAdapter {
         // Get team info
         String teamLogoURL = shortUrl + t.teamLogo;
         String tierURL = shortUrl + t.tierImg;
-        String urlT = url + t.teamId;
-        url = "[Team Page](" + urlT + ")";
+        String urlT = "";
+        urlT = url + t.teamId;
+        String urlTeam = "[Team Page](" + urlT + ")";
 
         // Set up embed
         teamEmbed.setTitle(t.teamName);
-        teamEmbed.setDescription(url);
+        teamEmbed.setDescription(urlTeam);
         teamEmbed.setThumbnail(tierURL);
         teamEmbed.setImage(teamLogoURL);
         teamEmbed.addField("Rank", t.teamRank + "", true);
