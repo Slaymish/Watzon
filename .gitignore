@@ -3,3 +3,7 @@
 
 # Ignore Gradle build output directory
 build
+
+
+# ignore token file
+*.txt
