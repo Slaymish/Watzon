@@ -45,8 +45,8 @@ public class Bot extends ListenerAdapter {
     public static void initialize() throws LoginException, InterruptedException {
         // Get token from file
         try {
-            Path path = FileSystems.getDefault().getPath("token.txt");
-            File tokenFile = new File(path.toString());
+            String filePath = new File("token.txt").getAbsolutePath();
+            File tokenFile = new File(filePath);
             try (Scanner scanner = new Scanner(tokenFile)) {
                 TOKEN = scanner.nextLine();
                 System.out.println(TOKEN);
